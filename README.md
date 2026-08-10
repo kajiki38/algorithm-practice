@@ -2,6 +2,9 @@
 
 手を動かして学ぶアルゴリズム学習サイト。ビルド不要・依存ライブラリなしの静的サイトです。
 
+## Pages
+https://kajiki38.github.io/algorithm-practice/
+
 ## 使い方
 
 `index.html` をブラウザで開くだけで動きます。
