@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>文字列探索 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-find-text"></span>文字列探索</h1>
+  <p class="page-lead">
+    Ctrl+F でページ内検索したとき、ブラウザの中では何が起きているのか？
+    「文字列の中から単語を探す」という身近な問題の、素直な解き方と賢い解き方を見比べるページ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      長い文章（テキスト）から短い単語（パターン）を探す —— エディタの検索、DNA の配列解析、ログの調査、ぜんぶこの問題だ。
+      いちばん素直なのは<b style="color: var(--text);">総当たり法</b>:
+      パターンをテキストの先頭に重ねて 1 文字ずつ照合し、ズレたら 1 文字右にずらしてまた最初から。
+      確実だが、途中まで一致していた情報を毎回捨てるのがもったいない。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      <b style="color: var(--text);">KMP 法</b>は「途中まで一致していたなら、次にどこから再開できるかは<b>事前に</b>計算できる」ことに気づいた賢い方法。
+      探し始める前にパターンだけを分析して小さな表（失敗関数）を作っておくと、本番ではテキストを<b style="color: var(--text);">一度も後戻りせず</b>に走り切れる。
+      「先にちょっと準備して、本番の無駄をなくす」—— 二分探索の「先にソート」と同じ発想だ。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">手法が<b>総当たり法</b>のまま「自動再生」。パターンが 1 文字ずつ右へずれながら照合していく様子を見る。緑 = 一致、赤 = 不一致。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">終わったら<b>比較回数をメモ</b>。手法を <b>KMP 法</b>に変えて同じテキストでもう一度 —— ずれ方が「ワープ」するのが分かる。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">「KMP 法の種明かし」を読んでから、パターンの下に出る<b>失敗関数の数字</b>を見ると、ワープ距離の正体がつかめる。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">最後に<b>対決モード</b>で、意地悪な入力での比較回数の差を実測。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt>テキスト / パターン</dt>
+        <dd>探される側の長い文字列が<b>テキスト</b>、探す側の短い文字列が<b>パターン</b>。「本文から単語を探す」の本文と単語。</dd>
+        <dt>シフト（ずらし）</dt>
+        <dd>パターンをテキストのどの位置に重ねているか。総当たりは 1 ずつ、KMP は賢く数マス一気にずらす。</dd>
+        <dt>前処理（まえしょり）</dt>
+        <dd>本番の探索を始める前にやっておく準備計算のこと。KMP はパターンの分析（失敗関数づくり）が前処理。</dd>
+        <dt>失敗関数</dt>
+        <dd>「パターンの j 文字目で照合に失敗したら、何文字目から再開できるか」を書いた早見表。パターンの中の「繰り返し模様」を利用している。</dd>
+        <dt><code>O(n·m)</code> と <code>O(n+m)</code></dt>
+        <dd>n はテキストの長さ、m はパターンの長さ。総当たりは最悪 n×m 回の比較、KMP は前処理 m + 本番 n 回程度で済む。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>1 比較ずつ観察する</h2>
+    <div class="controls">
+      <label>テキスト
+        <input type="text" id="str-text" value="ABABDABACDABABCABAB" maxlength="28" style="width: 240px; font-family: var(--font-mono);" aria-label="探索対象のテキスト">
+      </label>
+      <label>パターン
+        <input type="text" id="str-pattern" value="ABABC" maxlength="8" style="width: 110px; font-family: var(--font-mono);" aria-label="探すパターン">
+      </label>
+      <label>手法
+        <select id="str-algo">
+          <option value="naive">総当たり法</option>
+          <option value="kmp">KMP 法</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="str-step-btn"><span class="ico ico-next"></span>1比較進む</button>
+      <button class="btn" id="str-auto-btn"><span class="ico ico-play"></span>自動再生</button>
+      <button class="btn" id="str-reset-btn"><span class="ico ico-reset"></span>リセット</button>
+      <span class="stat-chip">比較 <b id="str-cmp">0</b> 回</span>
+      <span class="stat-chip">発見 <b id="str-found">0</b> 件</span>
+    </div>
+    <div class="str-area" id="str-view"></div>
+    <div id="str-msg" class="msg info">「1比較進む」でスタート。上がテキスト、下が現在の位置に合わせたパターン。</div>
+    <details class="hint-box">
+      <summary>KMP 法の種明かし — 失敗関数</summary>
+      <div style="font-size: 0.9rem; color: var(--text-dim);">
+        総当たりは不一致のたびに<b>1 文字だけ</b>ずらして先頭からやり直す。でも、途中まで一致していたなら「その一致部分の情報」を捨てるのはもったいない。
+        KMP は事前にパターンだけを調べて「j 文字目で失敗したら、次はパターンの何文字目から再開できるか」の表（失敗関数）を作っておく。
+        これにより<b>テキスト側の読み取り位置は決して後戻りしない</b> — だから比較回数は最大でもテキスト長の約 2 倍で済む。
+        上の可視化で KMP を選ぶと、パターンの下に失敗関数の値が表示される。
+      </div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>対決 — 意地悪な入力で差を見る</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      テキスト <span style="font-family: var(--font-mono);">"aaa…a"（60 文字）</span> から
+      <span style="font-family: var(--font-mono);">"aaaab"</span> を探す。総当たりは毎回 4 文字一致してから裏切られるので最悪ケースになる。
+      比較回数がどれだけ違うか、実測してみよう。
+    </p>
+    <div class="controls">
+      <button class="btn success" id="battle-btn"><span class="ico ico-play"></span>対決開始</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 90px; font-size: 0.82rem; color: var(--text-dim);">総当たり</span>
+        <div style="flex: 1; background: var(--bg-soft); border-radius: 6px; overflow: hidden;">
+          <div id="battle-bar-naive" style="height: 20px; background: linear-gradient(90deg,#f98a8a,#ef5b5b); width: 0;"></div>
+        </div>
+        <b id="battle-cmp-naive" style="font-family: var(--font-mono); width: 70px; text-align: right;">-</b>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 90px; font-size: 0.82rem; color: var(--text-dim);">KMP</span>
+        <div style="flex: 1; background: var(--bg-soft); border-radius: 6px; overflow: hidden;">
+          <div id="battle-bar-kmp" style="height: 20px; background: linear-gradient(90deg,#56e0ac,#2fb888); width: 0;"></div>
+        </div>
+        <b id="battle-cmp-kmp" style="font-family: var(--font-mono); width: 70px; text-align: right;">-</b>
+      </div>
+    </div>
+    <div id="battle-msg"></div>
+  </section>
+
+  <section class="panel">
+    <h2>整理</h2>
+    <table class="simple">
+      <thead><tr><th>手法</th><th>前処理</th><th>探索</th><th>ひとこと</th></tr></thead>
+      <tbody>
+        <tr><td>総当たり法</td><td>なし</td><td><code>O(n·m)</code> 最悪</td><td>短いパターンや 1 回きりの検索なら十分実用。実装 3 行。</td></tr>
+        <tr><td>KMP 法</td><td><code>O(m)</code>（失敗関数）</td><td><code>O(n)</code></td><td>テキストを後戻りしない。ストリーム(流れてくるデータ)にも使える。</td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      「先に少しだけ準備して、本番の無駄をなくす」— 二分探索の「先にソート」、ハッシュの「先に計算で場所を決める」と同じ思想。
+      次は集大成の<a href="pathfinding.html" style="color: var(--accent);">経路探索</a>へ。
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>理解度チェック</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      このページの内容が身についたか、4 問で確認しよう。
+    </p>
+    <div class="controls">
+      <button class="btn primary" id="sq-quiz-start"><span class="ico ico-quiz"></span>クイズを始める</button>
+      <span class="stat-chip">スコア <b id="sq-quiz-score">- / -</b></span>
+    </div>
+    <div id="sq-quiz-area" class="quiz-zone"></div>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/strings.js"></script>
+</body>
+</html>

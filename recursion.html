@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>再帰・分割統治 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-nest"></span>再帰・分割統治</h1>
+  <p class="page-lead">
+    「大きな問題を、同じ形の小さな問題に丸投げする」——
+    プログラミングでいちばん頭がひねられて、いちばん強力な考え方「再帰」を、パズルとツリーで体感するページ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      マトリョーシカ人形を開けると、中から一回り小さい同じ人形が出てくる。
+      <b style="color: var(--text);">再帰（さいき）とは、問題の中に「一回り小さい同じ問題」を見つけて、そっちに解かせる考え方</b>だ。
+      「10 枚の書類の山を処理して」と言われたら、「1 枚処理して、残り 9 枚の山は<i>同じやり方で</i>処理する」と考える。
+      9 枚の山は 8 枚に、8 枚は 7 枚に…… と小さくなっていき、最後に「0 枚の山 = 何もしなくていい」に行き着いて終わる。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      ルールは 2 つだけ。
+      ① <b style="color: var(--text);">これ以上小さくできない場合の答えを決めておく</b>（ベースケース。さっきの「0 枚なら何もしない」）。
+      ② <b style="color: var(--text);">それ以外は「小さくした同じ問題」に任せる</b>。
+      この 2 つが揃えば、どんなに大きい問題も自動的にほどけていく。
+      ただし使い方を誤ると、同じ計算を何千回も繰り返す罠もある —— それも下で目撃してもらう。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">まず<b>ハノイの塔を 3 枚で自力クリア</b>。ルールは「1 回 1 枚」「小さい円盤の上に大きい円盤は置けない」だけ。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">クリアしたら「なぜ最短が 2ⁿ−1 回なのか」を読み、<b>「模範解答を見る」</b>で再帰が生み出す手順を眺める。自分の手順と同じだった？</div></li>
+      <li><span class="step-no">3</span><div class="step-body">下の<b>フィボナッチの呼び出しツリー</b>で、素朴な再帰が同じ計算を何度もする様子を見る。同じ f(2) がツリーに何個あるか数えてみよう。</div></li>
+      <li><span class="step-no">4</span><div class="step-body"><b>「メモ化する」にチェック</b>を入れて、ツリーが痩せて呼び出し回数が激減するのを確認。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt>再帰（さいき）/ 再帰呼び出し</dt>
+        <dd>関数（処理のまとまり）が、自分自身をもう一度呼び出すこと。「fib(5) を求めるために fib(4) と fib(3) を呼ぶ」のように使う。</dd>
+        <dt>ベースケース</dt>
+        <dd>再帰の「止まる条件」。これを書き忘れると永遠に自分を呼び続けて暴走する。fib なら「f(0)=0, f(1)=1 はもう計算しなくていい」の部分。</dd>
+        <dt>フィボナッチ数列</dt>
+        <dd>「前の 2 つを足すと次になる」数列。0, 1, 1, 2, 3, 5, 8, 13… 定義がそのまま再帰の形をしているので、再帰の練習台の定番。</dd>
+        <dt>呼び出しツリー</dt>
+        <dd>「誰が誰を呼んだか」を枝分かれで描いた図。下のパネルで実物が見られる。枝の数 = 計算の量。</dd>
+        <dt>メモ化</dt>
+        <dd>一度計算した結果をメモしておき、同じ質問が来たらメモを見て即答するテクニック。次のステップ「動的計画法」の入り口。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>ハノイの塔</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      すべての円盤を <b>A から C へ</b>移す。ルール: 1 回に動かせるのは各杭の一番上の 1 枚だけ、
+      <b>小さい円盤の上に大きい円盤は置けない</b>。
+      杭をクリック(またはフォーカスして Enter)で持ち上げ → 移動先の杭をクリック。
+      n 枚の最短手数は <b>2ⁿ − 1</b> 回 — なぜそうなるかは、解き終えてから下の解説で。
+    </p>
+    <div class="controls">
+      <label>円盤の枚数 <b id="hanoi-n-label" style="font-family: var(--font-mono);">3</b>
+        <input type="range" id="hanoi-n" min="3" max="6" value="3">
+      </label>
+      <button class="btn" id="hanoi-reset-btn"><span class="ico ico-reset"></span>最初から</button>
+      <button class="btn" id="hanoi-auto-btn"><span class="ico ico-bot"></span>再帰の模範解答を見る</button>
+      <span class="stat-chip">手数 <b id="hanoi-moves">0</b></span>
+      <span class="stat-chip">最短 <b id="hanoi-best">7</b></span>
+    </div>
+    <div class="hanoi" id="hanoi-board"></div>
+    <div id="hanoi-msg" class="msg info">円盤のある杭をクリックして持ち上げよう。</div>
+    <details class="hint-box">
+      <summary>なぜ最短が 2ⁿ − 1 回なのか（解けてから読もう）</summary>
+      <div style="font-size: 0.9rem; color: var(--text-dim);">
+        n 枚を A→C に移すには、①上の n−1 枚を A→B に退避（小さい問題！）、②一番大きい円盤を A→C、③退避した n−1 枚を B→C（また同じ問題）。
+        つまり <span style="font-family: var(--font-mono);">手数(n) = 2 × 手数(n−1) + 1</span>。これを解くと 2ⁿ − 1。
+        「n 枚の問題を n−1 枚の問題 2 回に分ける」— これがそのまま再帰のコードになる。「模範解答を見る」でこの 3 段構造が動くのを確認しよう。
+      </div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>再帰の落とし穴 — フィボナッチの呼び出しツリー</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      <span style="font-family: var(--font-mono); color: var(--accent);">fib(n) = fib(n-1) + fib(n-2)</span> を定義どおり再帰で書くと、
+      <b>同じ計算を何度も繰り返す</b>。ツリーの中に同じ f(k) がいくつ現れるか数えてみよう。
+      そして「メモ化」をオンにすると、一度計算した結果を使い回してツリーが激変する。
+    </p>
+    <div class="controls">
+      <label>n = <b id="fib-n-label" style="font-family: var(--font-mono);">6</b>
+        <input type="range" id="fib-n" min="3" max="8" value="6">
+      </label>
+      <label style="user-select: none;">
+        <input type="checkbox" id="fib-memo"> メモ化する（計算済みの結果を使い回す）
+      </label>
+      <span class="stat-chip">素朴な再帰 <b id="fib-calls-naive">-</b> 回</span>
+      <span class="stat-chip">メモ化あり <b id="fib-calls-memo">-</b> 回</span>
+    </div>
+    <div class="call-tree-wrap" id="fib-tree"></div>
+    <div class="legend">
+      <span class="key"><span class="swatch" style="background: rgba(91,156,246,0.4)"></span>再帰呼び出し</span>
+      <span class="key"><span class="swatch" style="background: rgba(52,211,153,0.4)"></span>ベースケース（f(0)・f(1)）</span>
+      <span class="key"><span class="swatch" style="background: rgba(245,165,36,0.4)"></span>メモから取得（計算しない）</span>
+    </div>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      素朴版の呼び出し回数は n が 1 増えるごとに約 1.6 倍 — つまり O(2ⁿ) 級（計算量ページのクイズで出たやつ）。
+      メモ化すると O(n) に落ちる。この「メモ化」を推し進めた考え方が、次のステップ「動的計画法」だ。
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>分割統治 — 再帰の最強の使い方</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem; margin-bottom: 8px;">
+      問題を半分に割って、それぞれを再帰で解き、結果を合体する。この型を<b>分割統治</b>と呼ぶ。
+      すでに見たアルゴリズムの中にも隠れている:
+    </p>
+    <table class="simple">
+      <thead><tr><th>アルゴリズム</th><th>分割</th><th>統治（合体）</th><th>計算量</th></tr></thead>
+      <tbody>
+        <tr><td>マージソート</td><td>配列を半分に割る</td><td>ソート済み 2 列をマージ</td><td><code>O(n log n)</code></td></tr>
+        <tr><td>クイックソート</td><td>ピボットで大小に分ける</td><td>（分けた時点で完成）</td><td><code>O(n log n)</code> 平均</td></tr>
+        <tr><td>二分探索</td><td>半分を捨てる</td><td>残り半分だけ探す</td><td><code>O(log n)</code></td></tr>
+        <tr><td>ハノイの塔</td><td>n−1 枚の問題 × 2</td><td>最大の円盤を 1 手</td><td><code>O(2ⁿ)</code></td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      「半分に割る」と log n 段で済むから速い。「n−1 に減らすだけ」だと段数が n になり、ハノイのように枝が 2 本ずつ生えると 2ⁿ に爆発する。
+      <a href="sorting.html" style="color: var(--accent);">ソート可視化</a>でマージソートを再生して、この分割の形をもう一度見てみよう。
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>理解度チェック</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      このページの内容が身についたか、4 問で確認しよう。
+    </p>
+    <div class="controls">
+      <button class="btn primary" id="rc-quiz-start"><span class="ico ico-quiz"></span>クイズを始める</button>
+      <span class="stat-chip">スコア <b id="rc-quiz-score">- / -</b></span>
+    </div>
+    <div id="rc-quiz-area" class="quiz-zone"></div>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/recursion.js"></script>
+</body>
+</html>

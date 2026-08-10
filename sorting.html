@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>ソートアルゴリズム可視化 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-bars"></span>ソートアルゴリズム可視化</h1>
+  <p class="page-lead">
+    バラバラの数の列を小さい順に並べ替える「ソート」。
+    同じ結果にたどり着く方法が 7 種類もあって、それぞれ動き方も速さもまるで違う —— その違いを目で見て楽しむページ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      <b style="color: var(--text);">ソート（並べ替え）は、コンピュータの世界でいちばんよく使われる処理のひとつ。</b>
+      検索結果の並び順、ランキング、家計簿の日付順 —— ぜんぶソートだ。
+      そして STEP 1 で見たとおり、<b style="color: var(--text);">二分探索は「並んでいること」が前提</b>だった。
+      その「並べておく」を引き受けるのがソート。だからソートはあらゆるアルゴリズムの土台になっている。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      下の画面では、<b style="color: var(--text);">棒の高さ = 数の大きさ</b>。バラバラの棒たちが左から右へ低い順に整列していく様子をアニメーションで見られる。
+      注目してほしいのは動きの美しさだけじゃなく<b style="color: var(--text);">「比較」カウンタ</b>。
+      同じ 30 本を並べ替えるのに、バブルソートは 400 回以上比較するが、クイックソートは 150 回ほどで終わる。
+      同じ仕事なのに 3 倍近い差 —— この違いの正体は、次のステップ「計算量」で明かされる。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">まず<b>バブルソート</b>のまま「再生」を押して、最後まで眺める。緑（確定）が右から積み上がっていく。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">終わったら<b>比較の回数をメモ</b>して、アルゴリズムを<b>クイックソート</b>に変えてもう一度。回数の差に注目。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">「1つ進む」で 1 手ずつ送ると、右の<b>擬似コード</b>（プログラムの設計図を日本語混じりで書いたもの）のどの行が動いているかが光る。仕組みを知りたくなったらこれ。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">プリセットを「ほぼ整列済み」や「逆順」に変えると、<b>得意・不得意が逆転する</b>アルゴリズムがある。挿入ソートとクイックソートで試そう。</div></li>
+      <li><span class="step-no">5</span><div class="step-body">仕上げに<b>観察チャレンジ</b>。動きだけでどのソートか当てられたら、かなり見えている。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt>比較 / 交換</dt>
+        <dd>ソートの基本操作。「どっちが大きい？」と見比べるのが<b>比較</b>（オレンジ色に光る）、2 本の棒の場所を入れ替えるのが<b>交換</b>（赤く光る）。この回数が少ないほど速いアルゴリズム。</dd>
+        <dt>擬似コード（ぎじコード）</dt>
+        <dd>プログラムの手順を、特定の言語にしばられず読みやすく書いたメモのこと。「for i in 0 .. n-2」は「i を 0 から n−2 まで 1 つずつ増やしながら繰り返す」という意味。</dd>
+        <dt>配列（はいれつ）</dt>
+        <dd>データを 1 列に並べた入れ物。ここでは棒の列そのもの。各位置には 0 から始まる番号（インデックス）が付いている。</dd>
+        <dt>ピボット</dt>
+        <dd>クイックソートが使う「基準の値」（紫色の棒）。「ピボットより小さい組と大きい組に分ける」を繰り返すのがクイックソート。</dd>
+        <dt>安定ソート</dt>
+        <dd>同じ値が複数あったとき、元の順番を保ったまま並べ替えるソートのこと。マージソートは安定、クイックソートは不安定。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <div class="controls">
+      <label>アルゴリズム
+        <select id="algo-select">
+          <option value="bubble">バブルソート</option>
+          <option value="selection">選択ソート</option>
+          <option value="insertion">挿入ソート</option>
+          <option value="shell">シェルソート</option>
+          <option value="quick">クイックソート</option>
+          <option value="merge">マージソート</option>
+          <option value="heap">ヒープソート</option>
+        </select>
+      </label>
+      <label>要素数
+        <input type="range" id="size-slider" min="5" max="80" value="30">
+        <b id="size-label" style="font-family: var(--font-mono); min-width: 2ch;">30</b>
+      </label>
+      <label>速度
+        <input type="range" id="speed-slider" min="1" max="100" value="50">
+      </label>
+      <button class="btn" id="shuffle-btn"><span class="ico ico-shuffle"></span>シャッフル</button>
+      <label>
+        <select id="preset-select" aria-label="初期の並び方プリセット">
+          <option value="random">ランダム</option>
+          <option value="nearly">ほぼ整列済み</option>
+          <option value="reversed">逆順</option>
+          <option value="few">重複が多い</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="play-btn"><span class="ico ico-play"></span>再生</button>
+      <button class="btn" id="step-back-btn"><span class="ico ico-prev"></span>1つ戻る</button>
+      <button class="btn" id="step-btn"><span class="ico ico-next"></span>1つ進む</button>
+      <button class="btn" id="reset-btn"><span class="ico ico-reset"></span>最初から</button>
+      <input type="range" id="progress-slider" min="0" max="0" value="0" style="flex: 1; min-width: 160px;">
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="bars" id="bars"></div>
+        <div class="legend">
+          <span class="key"><span class="swatch" style="background: #f5a524"></span>比較中</span>
+          <span class="key"><span class="swatch" style="background: #f76d6d"></span>交換/書込</span>
+          <span class="key"><span class="swatch" style="background: #a78bfa"></span>ピボット</span>
+          <span class="key"><span class="swatch" style="background: #2fb888"></span>確定</span>
+          <span class="key"><span class="swatch" style="background: #4f8ef7; opacity: 0.35"></span>範囲外</span>
+        </div>
+        <div class="stats">
+          <span class="stat-chip">ステップ <b id="stat-step">0 / 0</b></span>
+          <span class="stat-chip">比較 <b id="stat-compare">0</b></span>
+          <span class="stat-chip">交換・書込 <b id="stat-write">0</b></span>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-top: 0;">擬似コード</h3>
+        <pre class="pseudocode" id="pseudocode"></pre>
+        <div id="algo-note" style="color: var(--text-dim); font-size: 0.88rem; margin-top: 12px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>観察チャレンジ</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      表示された動きだけを見て、どのソートアルゴリズムかを当てるゲーム。名前と擬似コードは隠される。
+    </p>
+    <div class="controls">
+      <button class="btn success" id="challenge-btn"><span class="ico ico-dice"></span>出題する</button>
+    </div>
+    <div id="challenge-area" style="display: none;">
+      <div class="bars" id="challenge-bars" style="height: 200px;"></div>
+      <div class="controls" style="margin-top: 12px;">
+        <button class="btn small" id="challenge-replay"><span class="ico ico-replay"></span>もう一度見る</button>
+      </div>
+      <div id="challenge-options"></div>
+      <div id="challenge-result"></div>
+      <div class="stats">
+        <span class="stat-chip">正解数 <b id="challenge-score">0 / 0</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>それぞれのアルゴリズムの特徴</h2>
+    <p style="color: var(--text-dim); font-size: 0.88rem;">
+      表の <code style="font-family: var(--font-mono); color: var(--ink-blue);">O(…)</code> は「データが増えたときの手間の増え方」を表す記号（次のステップ「計算量」で学ぶ）。
+      今は <b style="color: var(--text);">n² 系 = 遅いグループ、n log n 系 = 速いグループ</b>とだけ読めれば十分。
+    </p>
+    <table class="simple">
+      <thead>
+        <tr><th>アルゴリズム</th><th>平均</th><th>最悪</th><th>特徴</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>バブルソート</td><td><code>O(n²)</code></td><td><code>O(n²)</code></td><td>隣同士を比較して交換。最大値が泡のように右端へ「浮かぶ」。実用性は低いが動きが最も分かりやすい。</td></tr>
+        <tr><td>選択ソート</td><td><code>O(n²)</code></td><td><code>O(n²)</code></td><td>未ソート部分から最小値を「選択」して先頭へ。交換回数は最大 n−1 回で済むのが特徴。</td></tr>
+        <tr><td>挿入ソート</td><td><code>O(n²)</code></td><td><code>O(n²)</code></td><td>手札のカードを並べる動き。「ほぼ整列済み」データでは O(n) に近くなる。プリセットで試そう。</td></tr>
+        <tr><td>シェルソート</td><td><code>≈O(n^1.3)</code></td><td>ギャップ列に依存</td><td>離れた要素同士で挿入ソートし、間隔を詰めていく。挿入ソートの「遠くへ運ぶのが遅い」弱点を克服した改良版。</td></tr>
+        <tr><td>クイックソート</td><td><code>O(n log n)</code></td><td><code>O(n²)</code></td><td>ピボットで大小に分割して再帰。実測で最速級。ただし「逆順」プリセット + 末尾ピボットでは苦手な形になる。</td></tr>
+        <tr><td>マージソート</td><td><code>O(n log n)</code></td><td><code>O(n log n)</code></td><td>半分に割って統治(マージ)。どんな入力でも O(n log n) を保証。安定ソート。追加メモリが必要。</td></tr>
+        <tr><td>ヒープソート</td><td><code>O(n log n)</code></td><td><code>O(n log n)</code></td><td>配列を最大ヒープ(親≥子の木)に組んでから、最大値を末尾へ確定させ続ける。追加メモリ不要で最悪 O(n log n) 保証。</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/sorting.js"></script>
+</body>
+</html>

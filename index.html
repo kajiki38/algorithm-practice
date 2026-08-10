@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<title>アルゴリズム道場 — 手を動かして学ぶアルゴリズム入門</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <section class="hero">
+    <span class="eyebrow"><span class="ico ico-sparkle"></span>INTERACTIVE ALGORITHM LEARNING</span>
+    <h1>手を動かして学ぶ<br><span>アルゴリズム</span></h1>
+    <p>
+      読むだけでは身につかない。動かして、予想して、間違えて、腑に落とす。
+      可視化・ゲーム・クイズ・Python 実践 — 9 つのモジュールを学習順に進めて、アルゴリズムの直感を鍛えよう。
+    </p>
+    <div class="cta-row">
+      <a class="btn primary" href="search.html"><span class="ico ico-play"></span>まずは数当てゲームから</a>
+      <a class="btn" href="python.html"><span class="ico ico-code"></span>いきなり Python 実践</a>
+    </div>
+    <div class="hero-stats">
+      <div class="item"><div class="num">9</div><div class="desc">学習モジュール</div></div>
+      <div class="item"><div class="num">19</div><div class="desc">アルゴリズム収録</div></div>
+      <div class="item"><div class="num">40+</div><div class="desc">クイズ &amp; 問題</div></div>
+      <div class="item"><div class="num">100%</div><div class="desc">ブラウザ内で完結</div></div>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top: 20px;">
+    <h2>そもそも「アルゴリズム」ってなに？</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      アルゴリズムとは、<b style="color: var(--text);">問題を解くための手順書</b>のこと。料理のレシピと同じで、
+      「まず○○して、次に△△して…」という手順を、誰がやっても（コンピュータがやっても）同じ結果になるように書いたものだ。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      たとえば「1000 冊の本棚から 1 冊を探す」にも、<b style="color: var(--text);">端から順に全部見る</b>方法と、
+      <b style="color: var(--text);">五十音順に並べておいて真ん中から絞り込む</b>方法がある。どちらでも見つかるが、かかる手間は桁違い。
+      この「同じ問題でも、手順の工夫しだいで速さが劇的に変わる」というのがアルゴリズムの面白さで、このサイトで体感してほしいことのすべてだ。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem; margin-bottom: 0;">
+      <b style="color: var(--text);">予備知識は不要。</b>各ページは「知識ゼロからの説明 → 手を動かす → クイズで確認」の順に作ってある。
+      プログラミング経験がなくても STEP 1〜8 は遊べる。STEP 9 の Python 実践だけは、書きながら覚えたい人向け。
+      迷ったら STEP 1 の二分探索 —— ただの数当てゲームから始まるので、身構えなくて大丈夫。
+    </p>
+  </section>
+
+  <div class="card-grid">
+    <a class="card" href="search.html">
+      <span class="step-badge">STEP 1</span>
+      <div class="icon"><span class="ico ico-target"></span></div>
+      <h3>二分探索</h3>
+      <p>最初のステップは数当てゲームで遊ぶだけ。「半分に絞る」感覚を掴んだら、自分の手で二分探索を 1 手ずつ実行。100 万件でも高々 20 回で見つかる驚きを体感する。</p>
+      <div class="card-foot"><span class="tag">まずはゲームから</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="sorting.html">
+      <span class="step-badge">STEP 2</span>
+      <div class="icon"><span class="ico ico-bars"></span></div>
+      <h3>ソートアルゴリズム可視化</h3>
+      <p>バラバラの棒が整列していく様子をただ眺めるだけでも楽しい。バブルからヒープまで 7 種類の「動き方」と「比較回数」の違いを目で確かめる。観察チャレンジ付き。</p>
+      <div class="card-foot"><span class="tag">可視化 + ステップ実行</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="complexity.html">
+      <span class="step-badge">STEP 3</span>
+      <div class="icon"><span class="ico ico-line"></span></div>
+      <h3>計算量（Big-O）</h3>
+      <p>STEP 1〜2 で体感した「速い・遅い」に名前をつける。ゲームの 7 回、ソートの比較回数 —— あの数字の正体をグラフとクイズで腑に落とす。</p>
+      <div class="card-foot"><span class="tag">体験に名前をつける</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="datastructure.html">
+      <span class="step-badge">STEP 4</span>
+      <div class="icon"><span class="ico ico-layers"></span></div>
+      <h3>データ構造</h3>
+      <p>スタック・キュー・ハッシュテーブルを自分の手で操作。「取り出される順番」の予想クイズと、衝突が見えるハッシュ可視化で、後のモジュール全部の土台を作る。</p>
+      <div class="card-foot"><span class="tag">操作 + 予想クイズ</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="recursion.html">
+      <span class="step-badge">STEP 5</span>
+      <div class="icon"><span class="ico ico-nest"></span></div>
+      <h3>再帰・分割統治</h3>
+      <p>ハノイの塔を自分で解いて 2ⁿ−1 手の意味を知り、フィボナッチの呼び出しツリーで「同じ計算の繰り返し」とメモ化の効果を目撃する。</p>
+      <div class="card-foot"><span class="tag">パズル + ツリー可視化</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="dp.html">
+      <span class="step-badge">STEP 6</span>
+      <div class="icon"><span class="ico ico-grid"></span></div>
+      <h3>動的計画法（DP）</h3>
+      <p>メモ化の考えを一歩進めて「表を埋める」。コイン両替の DP テーブルを 1 マスずつ埋め、セルの値を当てるクイズと 2 次元ナップサックで型を身につける。</p>
+      <div class="card-foot"><span class="tag">表埋め + セル当てクイズ</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="strings.html">
+      <span class="step-badge">STEP 7</span>
+      <div class="icon"><span class="ico ico-find-text"></span></div>
+      <h3>文字列探索</h3>
+      <p>総当たり法と KMP 法を 1 比較ずつ再生。「先に少し準備して本番の無駄をなくす」前処理の発想を、意地悪入力での対決モードで実感する。</p>
+      <div class="card-foot"><span class="tag">可視化 + 対決モード</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="pathfinding.html">
+      <span class="step-badge">STEP 8</span>
+      <div class="icon"><span class="ico ico-route"></span></div>
+      <h3>経路探索</h3>
+      <p>集大成。グリッドに壁や沼を描いて BFS・DFS・ダイクストラ・A*・貪欲法の 5 手法を比較。キュー/スタック/優先度付きキューが探索の形を決める瞬間が見える。</p>
+      <div class="card-foot"><span class="tag">迷路づくり + 比較実験</span><span class="go">はじめる →</span></div>
+    </a>
+    <a class="card" href="python.html">
+      <span class="step-badge">STEP 9</span>
+      <div class="icon"><span class="ico ico-code"></span></div>
+      <h3>Python 実践</h3>
+      <p>ここまでの全モジュールを、今度は自分の手で書く。線形探索から DP・文字列まで全 12 問、ブラウザ内で実行・自動採点。ヒントと模範解答つき。</p>
+      <div class="card-foot"><span class="tag">コーディング + 自動採点</span><span class="go">はじめる →</span></div>
+    </a>
+  </div>
+</main>
+<script src="js/common.js"></script>
+</body>
+</html>

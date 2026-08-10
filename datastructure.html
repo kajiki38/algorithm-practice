@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>データ構造 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-layers"></span>データ構造 — スタック・キュー・ハッシュ</h1>
+  <p class="page-lead">
+    アルゴリズムは「データをどう持つか」で決まる。まずは 3 つの基本の入れ物を自分の手で操作して、
+    <b>取り出される順番</b>と<b>探すのにかかる手間</b>の違いを体に入れよう。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      <b style="color: var(--text);">データ構造とは、データの「入れ物」のこと。</b>
+      同じ 100 個のデータでも、山積みにするか、行列に並べるか、ラベル付きの棚に仕分けるかで、
+      「取り出す」「探す」にかかる手間がまったく変わる。
+      道具箱と同じで、<b style="color: var(--text);">入れ物の形にはそれぞれ得意な操作がある</b> —— それを知っていると、あとで学ぶアルゴリズムが「なぜその入れ物を使うのか」まで見えるようになる。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      このページで触るのは 3 つ。<b style="color: var(--text);">スタック</b>（本の山: 上にしか置けない・上からしか取れない）、
+      <b style="color: var(--text);">キュー</b>（レジの行列: 並んだ順に出ていく）、
+      <b style="color: var(--text);">ハッシュテーブル</b>（ラベル付きの棚: 計算で置き場所が即わかる）。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">スタックに値を 3 つ <b>push</b>（積む）してから 3 回 <b>pop</b>（取り出す）。<b>入れた順と逆に出てくる</b>ことを確認しよう。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">キューでも同じことを。今度は<b>入れた順のまま</b>出てくる。この違いがすべての出発点。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">違いが体に入ったか、<b>予想クイズ</b>でチェック。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">ハッシュテーブルに「サンプル 8 件を投入」して、キーが計算で棚に振り分けられる様子を見る。そのあと検索して<b>比較回数がリストよりずっと少ない</b>ことを確認。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt><code>push / pop</code>（プッシュ / ポップ）</dt>
+        <dd>スタックに「積む」「取り出す」操作の名前。プログラミングの世界の共通語なのでこのまま覚えて損はない。</dd>
+        <dt><code>enqueue / dequeue</code>（エンキュー / デキュー）</dt>
+        <dd>キュー（queue = 行列）に「並ぶ」「先頭から出る」操作の名前。</dd>
+        <dt><code>LIFO / FIFO</code></dt>
+        <dd>Last-In First-Out（最後に入れたものが最初に出る = スタック）と First-In First-Out（最初に入れたものが最初に出る = キュー）の略。</dd>
+        <dt>ハッシュ関数</dt>
+        <dd>キー（文字列など）から「何番の棚に入れるか」を計算で決める仕組み。このページでは「文字コードの合計を棚の数で割った余り」というシンプルな式を使っている。</dd>
+        <dt>衝突（しょうとつ）</dt>
+        <dd>違うキーがたまたま同じ棚に入ること。棚の中に鎖のようにぶら下げてしのぐ（チェイン法）。衝突が増えると検索が遅くなる。</dd>
+        <dt><code>O(1)</code> と <code>O(n)</code></dt>
+        <dd>計算量ページで学んだ記号。O(1) は「データが何個あっても手間は一定」、O(n) は「データの個数に比例して手間が増える」。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <div class="grid-2">
+    <section class="panel">
+      <h2>スタック（LIFO: 後入れ先出し）</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem;">
+        本の山と同じ。<b>最後に積んだものしか取れない</b>。関数呼び出し・元に戻す(Undo)・DFS の心臓部。
+      </p>
+      <div class="controls">
+        <input type="number" id="stack-input" placeholder="値" aria-label="pushする値" style="width: 90px;">
+        <button class="btn primary" id="stack-push-btn">push（積む）</button>
+        <button class="btn" id="stack-pop-btn">pop（取り出す）</button>
+        <span class="stat-chip">サイズ <b id="stack-size">0</b></span>
+      </div>
+      <div class="ds-stack" id="stack-view"><span class="ds-empty">空（push してみよう）</span></div>
+      <div id="stack-msg"></div>
+    </section>
+
+    <section class="panel">
+      <h2>キュー（FIFO: 先入れ先出し）</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem;">
+        レジの行列と同じ。<b>先に並んだものから順に出ていく</b>。処理待ちの管理・BFS の心臓部。
+      </p>
+      <div class="controls">
+        <input type="number" id="queue-input" placeholder="値" aria-label="enqueueする値" style="width: 90px;">
+        <button class="btn primary" id="queue-enq-btn">enqueue（並ぶ）</button>
+        <button class="btn" id="queue-deq-btn">dequeue（出る）</button>
+        <span class="stat-chip">サイズ <b id="queue-size">0</b></span>
+      </div>
+      <p style="color: var(--text-faint); font-size: 0.78rem; margin: 0 0 6px;">← 先頭（次に出る）</p>
+      <div class="ds-queue" id="queue-view"><span class="ds-empty">空（enqueue してみよう）</span></div>
+      <div id="queue-msg"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>予想クイズ — 次に出てくる値は？</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      スタックまたはキューに対する操作列を見て、<b>次に取り出される値</b>を予想しよう。
+      LIFO と FIFO の違いが体に入っているかのチェック。
+    </p>
+    <div class="controls">
+      <button class="btn success" id="ds-quiz-btn"><span class="ico ico-dice"></span>出題する</button>
+      <span class="stat-chip">正解数 <b id="ds-quiz-score">0 / 0</b></span>
+    </div>
+    <div id="ds-quiz-area"></div>
+  </section>
+
+  <section class="panel">
+    <h2>ハッシュテーブル — 一発でたどり着く索引</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      キーから<b>計算で</b>保管場所(バケツ)を決める。リストだと前から順に探すしかないが、
+      ハッシュならどれだけデータが増えても平均 O(1)。キーを追加して、同じバケツに入る「衝突」も観察しよう。
+    </p>
+    <div class="controls">
+      <input type="text" id="hash-input" placeholder="キー（例: apple）" aria-label="追加するキー" maxlength="12" style="width: 160px;">
+      <button class="btn primary" id="hash-add-btn">追加</button>
+      <button class="btn" id="hash-find-btn">検索</button>
+      <button class="btn" id="hash-sample-btn"><span class="ico ico-dice"></span>サンプル 8 件を投入</button>
+      <button class="btn" id="hash-clear-btn"><span class="ico ico-trash"></span>全消去</button>
+    </div>
+    <div id="hash-calc" class="code-block" style="display: none;"></div>
+    <div class="hash-buckets" id="hash-buckets"></div>
+    <div class="stats">
+      <span class="stat-chip">格納数 <b id="hash-count">0</b></span>
+      <span class="stat-chip">ハッシュ検索の比較回数 <b id="hash-cmp">-</b></span>
+      <span class="stat-chip">リスト(線形探索)なら <b id="hash-linear-cmp">-</b></span>
+    </div>
+    <div id="hash-msg"></div>
+  </section>
+
+  <section class="panel">
+    <h2>操作コストの整理</h2>
+    <table class="simple">
+      <thead><tr><th>データ構造</th><th>追加</th><th>取り出し / 検索</th><th>使いどころ</th></tr></thead>
+      <tbody>
+        <tr><td>スタック</td><td><code>O(1)</code></td><td>pop <code>O(1)</code>（最後の要素のみ）</td><td>関数呼び出し・Undo・DFS・括弧の対応チェック</td></tr>
+        <tr><td>キュー</td><td><code>O(1)</code></td><td>dequeue <code>O(1)</code>（先頭のみ）</td><td>処理待ち行列・BFS・タスクスケジューリング</td></tr>
+        <tr><td>ハッシュテーブル</td><td><code>O(1)</code> 平均</td><td>検索 <code>O(1)</code> 平均 / <code>O(n)</code> 最悪</td><td>辞書・集合・重複チェック・Two Sum</td></tr>
+        <tr><td>ただの配列(リスト)</td><td><code>O(1)</code>（末尾）</td><td>検索 <code>O(n)</code></td><td>順序が大事なとき・添字アクセス <code>O(1)</code></td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      次のステップは<a href="recursion.html" style="color: var(--accent);">再帰・分割統治</a>。
+      スタックは関数呼び出しの裏側でも働いていて、STEP 8 の経路探索では「キューを使うと BFS、スタックを使うと DFS」になる瞬間が見られる。
+    </p>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/datastructure.js"></script>
+</body>
+</html>

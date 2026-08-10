@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>経路探索 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-route"></span>経路探索アルゴリズム</h1>
+  <p class="page-lead">
+    カーナビはどうやって道を選んでいる？ ゲームの敵はなぜ最短ルートで追ってくる？
+    その中身が経路探索アルゴリズム。自分で迷路を作って、5 つの探し方を競わせてみよう。ここまでの総仕上げだ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      マス目の地図の上で、<b style="color: var(--text);">S（スタート）から G（ゴール）までの経路を探す</b>。
+      これはカーナビ・ゲーム AI・配達ルート計算の心臓部で、探し方によって
+      「調べるマスの数（＝速さ）」と「見つかる経路の質（＝賢さ）」が大きく変わる。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      面白いのは、5 つのアルゴリズムの違いが<b style="color: var(--text);">「次にどのマスを調べるかを、どの入れ物で管理するか」だけ</b>だということ。
+      データ構造ページで触った<b style="color: var(--text);">キュー</b>を使うと近い順に波紋のように広がる BFS になり、
+      <b style="color: var(--text);">スタック</b>に変えただけで一本道を突き進む DFS になる。
+      優先度付きキュー（安い順に取り出せる入れ物）にすればダイクストラ法や A* になる。入れ物が探索の性格を決める。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">何も描かずに <b>BFS で「探索開始」</b>。S から波紋のように広がって G に届く様子を見る。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">グリッドを<b>ドラッグして壁を描き</b>、迷路にしてもう一度。アルゴリズムを <b>DFS</b> に変えると探し方が激変する。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">道具を「沼」にして S と G の間に<b>沼地帯</b>を描く。BFS と<b>ダイクストラ法</b>で経路のコストを見比べると、「マス数最短」と「コスト最小」の違いが見える。</div></li>
+      <li><span class="step-no">4</span><div class="step-body"><b>「5つ全部比較」</b>で一覧表に。実験レシピの「貪欲法を騙す」も試すと、賢そうなアルゴリズムの弱点まで見える。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt>コスト</dt>
+        <dd>移動の「大変さ」。普通のマスは 1 歩 = 1、沼マスは 1 歩 = 5。「経路のコスト」は通ったマスのコストの合計で、小さいほど良い経路。</dd>
+        <dt>探索済み（青いマス）</dt>
+        <dd>アルゴリズムが「調べ終わった」マス。この数が少ないほど無駄なく探せている。ゴールが見つかった瞬間に探索は打ち切られる。</dd>
+        <dt>優先度付きキュー</dt>
+        <dd>「いちばん値が小さいものから取り出せる」特別な行列。ダイクストラ法・A*・貪欲法はこれで「次に調べるべき最有力マス」を管理する。</dd>
+        <dt>ヒューリスティック（見積り）</dt>
+        <dd>「ここからゴールまで、壁がなければ最低あと何マスか」というザックリ予想。A* はこの予想をコストに足して、ゴール方向を優先的に調べる。予想が控えめ（実際より大きく言わない）なら最短保証は崩れない。</dd>
+        <dt>最短保証</dt>
+        <dd>「見つけた経路が本当にいちばん良い」と数学的に言い切れるかどうか。BFS（マス数の意味で）とダイクストラ・A*（コストの意味で）は○、DFS と貪欲法は×。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <div class="controls">
+      <span style="font-size: 0.85rem; color: var(--text-dim);">描くもの:</span>
+      <button class="btn small toggled" id="tool-wall" data-tool="wall"><span class="tool-sw" style="background:#3d4c70"></span>壁</button>
+      <button class="btn small" id="tool-weight" data-tool="weight"><span class="tool-sw" style="background:#493a14"></span>沼（コスト5）</button>
+      <button class="btn small" id="tool-erase" data-tool="erase"><span class="ico ico-eraser"></span>消しゴム</button>
+      <button class="btn small" id="tool-start" data-tool="start"><span class="tool-sw round" style="background:#4f8ef7"></span>スタート移動</button>
+      <button class="btn small" id="tool-goal" data-tool="goal"><span class="tool-sw round" style="background:#ef5b5b"></span>ゴール移動</button>
+      <span style="flex: 1;"></span>
+      <button class="btn small" id="random-walls-btn"><span class="ico ico-dice"></span>ランダム壁</button>
+      <button class="btn small" id="clear-btn"><span class="ico ico-trash"></span>全消去</button>
+    </div>
+    <div class="controls">
+      <label>アルゴリズム
+        <select id="pf-algo">
+          <option value="bfs">BFS（幅優先探索）</option>
+          <option value="dfs">DFS（深さ優先探索）</option>
+          <option value="dijkstra">ダイクストラ法</option>
+          <option value="astar">A*（エースター）</option>
+          <option value="greedy">貪欲最良優先探索</option>
+        </select>
+      </label>
+      <button class="btn primary" id="pf-run-btn"><span class="ico ico-play"></span>探索開始</button>
+      <button class="btn" id="pf-compare-btn"><span class="ico ico-scale"></span>5つ全部比較</button>
+      <label>速度 <input type="range" id="pf-speed" min="1" max="100" value="60"></label>
+    </div>
+
+    <div class="pf-grid" id="pf-grid"></div>
+
+    <div class="legend" style="margin-top: 10px;">
+      <span class="key"><span class="swatch" style="background: var(--accent)"></span>スタート</span>
+      <span class="key"><span class="swatch" style="background: var(--danger)"></span>ゴール</span>
+      <span class="key"><span class="swatch" style="background: #3d4c70"></span>壁（通れない）</span>
+      <span class="key"><span class="swatch" style="background: #493a14"></span>沼（コスト5）</span>
+      <span class="key"><span class="swatch" style="background: rgba(91,156,246,0.35)"></span>探索済み</span>
+      <span class="key"><span class="swatch" style="background: var(--accent-2)"></span>経路</span>
+    </div>
+    <div class="stats">
+      <span class="stat-chip">探索したマス <b id="pf-visited">-</b></span>
+      <span class="stat-chip">経路の長さ <b id="pf-length">-</b></span>
+      <span class="stat-chip">経路のコスト <b id="pf-cost">-</b></span>
+    </div>
+    <div id="pf-message"></div>
+    <div id="pf-compare-result"></div>
+  </section>
+
+  <section class="panel">
+    <h2>やってみよう（実験レシピ）</h2>
+    <ol style="color: var(--text-dim); padding-left: 22px; margin: 8px 0;">
+      <li><b style="color: var(--text);">BFS と DFS を比較</b> — 同じ迷路で両方実行。BFS は波紋のように広がり最短経路を保証、DFS は一本道を突き進み、遠回りな経路を平気で返すことを確認しよう。</li>
+      <li><b style="color: var(--text);">沼を描いて BFS vs ダイクストラ</b> — S と G の間に沼地帯を作る。BFS は「マス数最短」なので沼を突っ切るが、ダイクストラは「コスト最小」なので迂回する。経路コストの差を見よ。</li>
+      <li><b style="color: var(--text);">ダイクストラ vs A*</b> — 壁のない広い盤面で実行。探索したマスの数を比べると、A* がゴール方向へ「賢く」向かうのが分かる。それでも見つかる経路のコストは同じ（A* のヒューリスティックが適切なら最短性は保たれる）。</li>
+      <li><b style="color: var(--text);">貪欲法を騙す</b> — S と G の間に「コの字型」の壁（G 側が開いた袋小路）を作って貪欲最良優先を実行。ゴールに近づこうとして袋小路に突っ込み、A* より悪い経路を返すことを確認。ヒューリスティック「だけ」に頼る危うさが分かる。</li>
+      <li><b style="color: var(--text);">行き止まりを作る</b> — G を壁で完全に囲むと？ どのアルゴリズムも「経路なし」を正しく報告することを確認。</li>
+    </ol>
+  </section>
+
+  <section class="panel">
+    <h2>5 つのアルゴリズムの整理</h2>
+    <table class="simple">
+      <thead>
+        <tr><th>アルゴリズム</th><th>データ構造</th><th>最短保証</th><th>ひとこと</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>BFS</td><td>キュー（先入れ先出し）</td><td>○（マス数の意味で）</td><td>近い所から均等に調べる。重みがない世界の王様。</td></tr>
+        <tr><td>DFS</td><td>スタック（後入れ先出し）</td><td>×</td><td>行ける所まで突き進む。到達可能性の判定や迷路生成に向く。</td></tr>
+        <tr><td>ダイクストラ法</td><td>優先度付きキュー</td><td>○（コストの意味で）</td><td>「今いちばん安く行ける所」から確定させる。負のコストは扱えない。</td></tr>
+        <tr><td>A*</td><td>優先度付きキュー</td><td>○（条件付き）</td><td>ダイクストラ + 「ゴールへの見積り（ヒューリスティック）」。見積りが控えめ（過大評価しない）なら最短を保証。</td></tr>
+        <tr><td>貪欲最良優先</td><td>優先度付きキュー</td><td>×</td><td>「ゴールに近そうな所」だけを頼りに突き進む。速いが騙されやすい — コの字型の壁で試すと遠回りな経路を返す。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>理解度チェック</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      総仕上げの 4 問。データ構造ページの内容もからめて出題する。
+    </p>
+    <div class="controls">
+      <button class="btn primary" id="pq-quiz-start"><span class="ico ico-quiz"></span>クイズを始める</button>
+      <span class="stat-chip">スコア <b id="pq-quiz-score">- / -</b></span>
+    </div>
+    <div id="pq-quiz-area" class="quiz-zone"></div>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/pathfinding.js"></script>
+</body>
+</html>

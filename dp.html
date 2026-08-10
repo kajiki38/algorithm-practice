@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>動的計画法（DP）— アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-grid"></span>動的計画法（DP）</h1>
+  <p class="page-lead">
+    名前はいかついが、やることは「小さい答えから順に表を埋める」だけ。
+    競技プログラミングでも実務でも大活躍する技法「動的計画法（DP）」を、表を自分で埋めながら覚えるページ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      「10 段の階段を一気に登れ」と言われたら大変だが、<b style="color: var(--text);">1 段目、2 段目…と順に足場を作っていけば、いつの間にか 10 段目に着いている</b>。
+      動的計画法（Dynamic Programming、略して DP）はこの発想の技法だ。
+      いきなり大きい問題を解こうとせず、<b style="color: var(--text);">いちばん小さい問題の答えから順に「表」に書き溜めていき、
+      前の答えを使い回しながら大きい答えに育てる</b>。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      前のステップの再帰は「大きい問題を上から分解」した。DP は同じことを<b style="color: var(--text);">下から積み上げる</b>だけ ——
+      実は裏表の関係で、再帰＋メモ化と DP は同じ計算をしている。
+      題材は「コイン両替」。1 円・3 円・4 円のコインで 6 円を払うとき、最少何枚？
+      「大きいコインから使えばいい」と思った人は…… 4+1+1 の 3 枚。正解は 3+3 の 2 枚。
+      <b style="color: var(--text);">直感（貪欲法）が外れる問題こそ、DP の出番</b>だ。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">コイン両替で<b>「1マス埋める」を何度か押す</b>。各マスが「すでに埋まった青いマス + コイン 1 枚」から計算される流れを見る。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">慣れたら<b>「セル当てクイズ」</b>。次のマスの値を自分で予想して入力。当てられれば DP は理解できている。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">最後まで埋めると、緑のマスをたどって<b>「どのコインを使ったか」まで復元</b>される様子が見られる。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">下の<b>ナップサック</b>は表が 2 次元になるバージョン。「1行まとめて」で埋めながら、各マスが「上のマス（入れない）」と「左上のマス（入れる）」の比べ合いで決まることを確認。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt><code>dp[i]</code> の読み方</dt>
+        <dd>「dp という表の i 番目のマス」。大事なのは<b>マスの意味を日本語で言えること</b>。このページでは「dp[i] = i 円を作る最少枚数」。dp[7] = 2 なら「7 円は最少 2 枚で作れる」。</dd>
+        <dt>漸化式（ぜんかしき）</dt>
+        <dd>「前のマスの答えから次のマスの答えを作る式」。dp[i] = min(dp[i−1], dp[i−3], dp[i−4]) + 1 は「最後に 1 円か 3 円か 4 円を使ったと場合分けして、いちばん得なもの + 1 枚」という意味。</dd>
+        <dt><code>min(a, b, c)</code> / <code>max(a, b)</code></dt>
+        <dd>いちばん小さい値 / いちばん大きい値を選ぶだけの操作。</dd>
+        <dt>貪欲法（どんよくほう）</dt>
+        <dd>「その場でいちばん良さそうな選択」を繰り返す作戦。速いが、コイン両替のように失敗する問題もある。経路探索ページの「貪欲最良優先」も同じ族。</dd>
+        <dt>トレースバック</dt>
+        <dd>埋め終わった表を逆からたどって「どういう選択でこの答えになったか」を復元すること。答えの枚数だけでなく「何を使ったか」まで分かる。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>コイン両替 — 最少枚数を表で求める</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      コインは <b style="font-family: var(--font-mono);">{1, 3, 4}</b> 円の 3 種類。金額 i 円を作る最少枚数 dp[i] を 0 円から順に埋めていく。
+      漸化式は <span style="font-family: var(--font-mono); color: var(--accent);">dp[i] = min(dp[i−1], dp[i−3], dp[i−4]) + 1</span> —
+      「最後に使う 1 枚」で場合分けして、<b>すでに埋まったセル(青)を参照する</b>のがポイント。
+    </p>
+    <div class="controls">
+      <label>金額
+        <input type="range" id="coin-amount" min="6" max="15" value="11">
+        <b style="font-family: var(--font-mono); white-space: nowrap;"><span id="coin-amount-label" style="display: inline-block; min-width: 2ch; text-align: right;">11</span> 円</b>
+      </label>
+      <button class="btn primary" id="coin-step-btn"><span class="ico ico-next"></span>1マス埋める</button>
+      <button class="btn" id="coin-auto-btn"><span class="ico ico-play"></span>自動で埋める</button>
+      <button class="btn" id="coin-reset-btn"><span class="ico ico-reset"></span>リセット</button>
+      <button class="btn success" id="coin-quiz-btn"><span class="ico ico-quiz"></span>セル当てクイズ</button>
+    </div>
+    <div class="dp-cells" id="coin-cells"></div>
+    <div id="coin-quiz-row" class="controls" style="display: none; margin-top: 12px;">
+      <span style="font-size: 0.9rem; color: var(--text-dim);">dp[<b id="coin-quiz-target" style="color: var(--violet);">?</b>] の値は？</span>
+      <input type="number" id="coin-quiz-input" min="0" max="15" aria-label="セルの値の予想" style="width: 80px;">
+      <button class="btn primary" id="coin-quiz-submit">判定</button>
+    </div>
+    <div id="coin-msg" class="msg info">「1マス埋める」で dp[1] から順に埋めていこう。</div>
+  </section>
+
+  <section class="panel">
+    <h2>0/1 ナップサック — 2 次元の表</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      容量 <b>8kg</b> のリュックに、価値の合計が最大になるように品物を詰める（各 1 個まで）。
+      表の行は「ここまでの品物で」、列は「容量 w のとき」。各マスは
+      <span style="font-family: var(--font-mono); color: var(--accent);">max(入れない↑, 入れる↖+価値)</span> で決まる。
+      埋め終わったら、表を右下から逆にたどると「何を入れたか」まで分かる。
+    </p>
+    <div class="controls" id="knap-items"></div>
+    <div class="controls">
+      <button class="btn primary" id="knap-step-btn"><span class="ico ico-next"></span>1マス埋める</button>
+      <button class="btn" id="knap-row-btn">1行まとめて</button>
+      <button class="btn" id="knap-auto-btn"><span class="ico ico-play"></span>自動で埋める</button>
+      <button class="btn" id="knap-reset-btn"><span class="ico ico-reset"></span>リセット</button>
+    </div>
+    <div class="knap-scroll">
+      <table class="knap" id="knap-table"></table>
+    </div>
+    <div id="knap-msg" class="msg info">左上から 1 マスずつ。まず「品物なし」の行はぜんぶ 0。</div>
+  </section>
+
+  <section class="panel">
+    <h2>DP の考え方 3 か条</h2>
+    <ol style="color: var(--text-dim); padding-left: 22px; margin: 8px 0;">
+      <li><b style="color: var(--text);">小さい問題の答えを表に貯める</b> — dp[i] の意味を日本語で言えるようにする（「i 円を作る最少枚数」）。</li>
+      <li><b style="color: var(--text);">漸化式 = 最後の 1 手で場合分け</b> — 「最後に使ったコインは 1 円? 3 円? 4 円?」のように、最後の選択で分けると式が立つ。</li>
+      <li><b style="color: var(--text);">埋める順番に気をつける</b> — 参照するセルが必ず先に埋まっている順（小さい方から）で埋める。</li>
+    </ol>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      再帰(メモ化)は「上から必要な分だけ」、DP は「下から全部」— 同じ漸化式の 2 つの実行順にすぎない。
+      Python 実践の「min_coins」で、この表をそのままコードにしてみよう。
+    </p>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/dp.js"></script>
+</body>
+</html>

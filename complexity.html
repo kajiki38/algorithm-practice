@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>計算量（Big-O）— アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-line"></span>計算量（Big-O 記法）</h1>
+  <p class="page-lead">
+    STEP 1 のゲームは 7 回で当たり、STEP 2 ではソートによって比較回数が 3 倍も違った。
+    この「速い・遅い」の体験に名前をつけるのが計算量。体験したあとなら、ぜんぜん怖くない。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      ここまでの 2 ページで、あなたはもう計算量を<b style="color: var(--text);">体験している</b>。
+      127 個の候補から 7 回で当てた数当てゲーム。同じ 30 本の棒なのに、バブルソートは 400 回・クイックソートは 150 回だった比較カウンタ。
+      —— この「<b style="color: var(--text);">データ量が増えたとき、手間がどんなペースで増えるか</b>」の違いに名前をつける物差しが計算量だ。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      名前は <b style="color: var(--text);">O(…)</b> という記号（Big-O 記法・ビッグオー）で書く。仰々しく見えるが、
+      正体は「増え方のペースの分類ラベル」にすぎない。まずは体験した 3 つから:
+    </p>
+    <table class="simple">
+      <thead><tr><th>すでに体験したこと</th><th>手間の増え方</th><th>つく名前</th></tr></thead>
+      <tbody>
+        <tr><td>線形探索（前から順に見る）—— 1000 件なら最悪 1000 回</td><td>データの個数に<b>比例</b></td><td><code>O(n)</code>（オー・エヌ）</td></tr>
+        <tr><td>数当てゲーム —— 127 個でも 7 回、100 万個でも 20 回</td><td>半分に絞るので<b>ほとんど増えない</b></td><td><code>O(log n)</code>（オー・ログ・エヌ）</td></tr>
+        <tr><td>バブルソート —— 30 本で 400 回超、60 本だと 1700 回超</td><td>個数の <b>2 乗</b>に比例（2 倍で 4 倍）</td><td><code>O(n²)</code>（オー・エヌ・じじょう）</td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      読み方はこれだけ: <span style="font-family: var(--font-mono); color: var(--accent);">O(n)</span> は「データが n 個なら手間もだいたい n に比例」、
+      <span style="font-family: var(--font-mono); color: var(--accent);">O(n²)</span> は「n の 2 乗に比例（データ 10 倍で手間 100 倍）」。
+      細かい定数（400 回か 450 回か）は気にせず、<b style="color: var(--text);">「増え方のペース」だけを見る</b>のがコツ。
+      下のグラフで、この 3 つ + 新顔 3 つの曲線を自分の手で動かしてみよう。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body">下のグラフで <b>n（データの個数）のスライダーを動かし</b>、曲線ごとの増え方の違いを見る。O(n²) だけ急カーブになるはず。</div></li>
+      <li><span class="step-no">2</span><div class="step-body"><b>O(2ⁿ) のボタンを押してオンにする</b>。他の曲線が見えなくなるほど爆発的に増えることを確認したら、「対数スケール」に切り替えて全体を見る。</div></li>
+      <li><span class="step-no">3</span><div class="step-body">「1 秒でどこまで戦える？」の表で、<b>計算量ごとの実用的な限界</b>を眺める。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">最後に<b>クイズ 12 問</b>。コードを見て計算量を当てられたら、このページは卒業。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt><code>n</code>（エヌ）</dt>
+        <dd>扱うデータの個数のこと。「配列の長さ」「リストの要素数」だと思えばよい。n = 1000 なら「データが 1000 個ある」という意味。</dd>
+        <dt><code>O(…)</code>（オー記法 / Big-O）</dt>
+        <dd>「手間の増え方のペース」を表す記号。O は Order（オーダー = およその規模）の頭文字。O(n) =「n に比例」、O(1) =「データが何個でも手間は一定」。</dd>
+        <dt><code>log n</code>（ログ・対数）</dt>
+        <dd>「n を 2 で何回割ったら 1 になるか」という回数のこと。n = 8 なら 3 回（8→4→2→1）、n = 100 万でも約 20 回。「毎回半分に絞る」作戦の手数がこれ。爆発的に大きい n でも log n は小さいまま —— だから二分探索は速い。</dd>
+        <dt><code>2ⁿ</code>（指数）</dt>
+        <dd>log の逆で、「1 増えるたびに 2 倍になる」増え方。n = 30 で約 10 億。コンピュータでも n が 30〜40 を超えるとお手上げになる、最も恐ろしい増え方。</dd>
+        <dt>最悪 / 平均</dt>
+        <dd>同じアルゴリズムでも、運が悪い入力だと遅くなることがある。「最悪」はいちばん不運な場合の計算量、「平均」はならした場合の計算量。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>成長曲線を操作する</h2>
+    <div class="controls">
+      <label>n の最大値
+        <input type="range" id="cx-n" min="10" max="200" value="50">
+        <b id="cx-n-label" style="font-family: var(--font-mono); min-width: 3ch;">50</b>
+      </label>
+      <label style="user-select: none;">
+        <input type="checkbox" id="cx-log"> 縦軸を対数スケールにする
+      </label>
+    </div>
+    <div class="controls" id="cx-series-toggles"></div>
+    <div style="position: relative;">
+      <canvas class="chart" id="cx-canvas" height="360"></canvas>
+      <div id="cx-tooltip" style="position: absolute; display: none; pointer-events: none; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; font-family: var(--font-mono); z-index: 10; white-space: nowrap; box-shadow: var(--shadow);"></div>
+    </div>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">
+      <span class="ico ico-bulb" style="color: var(--warn)"></span> 試すこと: ① O(2ⁿ) をオンにすると、曲線が序盤で一気にグラフの上へ突き抜けてしまう → 対数スケールに切り替えると全体像が見える。
+      ② カーソルを合わせて n を 2 倍にしたとき、各曲線の値が何倍になるかを読み取る（O(n) は 2 倍、O(n²) は 4 倍、O(2ⁿ) は…）。
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>1 秒でどこまで戦える？</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      コンピュータが 1 秒に約 <b>10⁸ 回</b>（1 億回）の基本操作をこなせるとしよう。
+      各計算量のアルゴリズムが「1 秒以内」で処理できるデータ件数 n のおおよその上限がこれだ。
+      競技プログラミングでは、この表から逆算して使うべきアルゴリズムを選ぶ。
+    </p>
+    <table class="simple">
+      <thead><tr><th>計算量</th><th>1 秒で扱える n の目安</th><th>代表例</th></tr></thead>
+      <tbody>
+        <tr><td><code>O(log n)</code></td><td>ほぼ無制限（10⁹ でも約 30 回）</td><td>二分探索</td></tr>
+        <tr><td><code>O(n)</code></td><td>約 100,000,000（10⁸）</td><td>線形探索・1 回のループ</td></tr>
+        <tr><td><code>O(n log n)</code></td><td>約 5,000,000（5×10⁶）</td><td>マージソート・クイックソート</td></tr>
+        <tr><td><code>O(n²)</code></td><td>約 10,000（10⁴）</td><td>バブルソート・二重ループ</td></tr>
+        <tr><td><code>O(2ⁿ)</code></td><td>約 26</td><td>部分集合の全列挙</td></tr>
+        <tr><td><code>O(n!)</code></td><td>約 11</td><td>順列の全列挙</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>計算量当てクイズ</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      Python のコードを読んで、時間計算量を当てよう。全 12 問。Python を知らなくても大丈夫 ——
+      見るのは「ループが何重か」「ループの回る回数が n とどう関係するか」だけだ。
+    </p>
+    <div class="point-box">
+      <span class="ico ico-bulb"></span>
+      <div>
+        <b>解き方の 4 パターン:</b>
+        ① ループ 1 重で n 回 → <b>O(n)</b>。
+        ② ループの中にループ（入れ子）→ 回数を<b>掛け算</b>して O(n²)。
+        ③ ループが並んでいるだけ（直列）→ <b>足し算</b>なので大きい方だけ残る。
+        ④ 毎回半分（または 2 倍・10 倍）になる → <b>O(log n)</b>。
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="quiz-start-btn">クイズを始める</button>
+      <span class="stat-chip">スコア <b id="quiz-score">- / -</b></span>
+    </div>
+    <div id="quiz-area"></div>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/complexity.js"></script>
+</body>
+</html>

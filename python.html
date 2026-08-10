@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>Python 実践 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-code"></span>Python 実践道場</h1>
+  <p class="page-lead">
+    見て理解したアルゴリズムを、今度は自分の手で書く。コードはブラウザの中でそのまま実行・自動採点されるので、
+    インストールも設定も不要。このページを開いた瞬間から Python が書ける。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと・使い方</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      ここまでのページで「見て」理解したアルゴリズムは、<b style="color: var(--text);">自分で書けて初めて本当に身につく</b>。
+      全 12 問はやさしい順 —— 前半はプログラミング入門レベル、後半に進むほどこのサイトで学んだ考え方が問われる。
+      Python を選んだのは、いちばん日本語の文章に近く読み書きしやすい言語だから。初めてでも問題 1〜2 から始めれば大丈夫。
+    </p>
+    <h3>進め方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body"><b>問題文を読む</b>。「関数 ○○(…) を書こう」とあるのは、「この名前の処理のかたまりを完成させて」という意味。エディタには途中まで書かれた下書きが入っている。</div></li>
+      <li><span class="step-no">2</span><div class="step-body">エディタの <span style="font-family: var(--font-mono);"># ここに実装する</span> の部分に<b>自分のコードを書く</b>。行頭の字下げ（スペース 4 つ）が意味を持つのが Python の特徴なので、下書きの字下げに合わせること。</div></li>
+      <li><span class="step-no">3</span><div class="step-body"><b>「テスト実行」</b>を押すと、いろいろな入力で自動チェックされる。✔ と ✘ で結果が出るので、✘ の「期待値」と自分の出力を見比べて直す。<b>間違えても壊れないので何度でも</b>。</div></li>
+      <li><span class="step-no">4</span><div class="step-body">詰まったら<b>ヒント 1 → 2 → 3</b> の順に開く。15 分粘ってダメなら模範解答を見て、<b>写して動かしてから</b>白紙でもう一度書くのが最短の上達法。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> Python がはじめての人へ: 最低限の文法メモ</summary>
+      <dl class="glossary">
+        <dt><code>def sum_list(nums):</code></dt>
+        <dd>「sum_list という名前の関数（処理のかたまり）を定義する。nums という材料を受け取る」という意味。関数の中身は字下げして書く。</dd>
+        <dt><code>return x</code></dt>
+        <dd>「答えとして x を返して終わる」。テストはこの返した値をチェックしている。print（画面に表示）とは別物なので注意。</dd>
+        <dt><code>for x in nums:</code></dt>
+        <dd>「nums の中身を先頭から 1 つずつ x に入れて繰り返す」。回数で回すなら <code>for i in range(n):</code>（i が 0, 1, …, n−1 と動く）。</dd>
+        <dt><code>if a &lt; b:</code> / <code>elif</code> / <code>else</code></dt>
+        <dd>「もし a が b より小さいなら…、そうでなくてもし…、どれでもなければ…」の場合分け。</dd>
+        <dt><code>nums[i]</code> / <code>len(nums)</code></dt>
+        <dd>リスト nums の i 番目の要素（0 から数える）/ リストの長さ。<code>nums.append(x)</code> で末尾に追加。</dd>
+        <dt>インデント（字下げ）</dt>
+        <dd>Python は「どこからどこまでがループや if の中身か」を字下げで表す。エディタでは Tab キーでスペース 4 つが入る。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <div id="pyodide-status" class="msg info">Python 実行環境を準備中…</div>
+
+  <div class="tabs" id="mode-tabs" role="tablist">
+    <button class="tab-btn active" data-mode="problems" role="tab" aria-selected="true">問題を解く</button>
+    <button class="tab-btn" data-mode="playground" role="tab" aria-selected="false">自由に実行（プレイグラウンド）</button>
+  </div>
+
+  <!-- ===== 問題モード ===== -->
+  <section id="problems-mode">
+    <div class="controls" id="problem-tabs"></div>
+    <section class="panel">
+      <h2 id="prob-title"></h2>
+      <div id="prob-desc" style="color: var(--text-dim); font-size: 0.95rem;"></div>
+      <div id="prob-hints"></div>
+      <h3>コード</h3>
+      <div class="editor-window">
+        <div class="editor-titlebar">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="editor-filename" id="editor-filename">solution.py</span>
+        </div>
+        <textarea class="editor" id="prob-editor" spellcheck="false" aria-label="解答コードエディタ（Python）"></textarea>
+      </div>
+      <div class="controls" style="margin-top: 10px;">
+        <button class="btn success" id="run-tests-btn" disabled><span class="ico ico-check"></span>テスト実行（採点）</button>
+        <button class="btn" id="reset-code-btn"><span class="ico ico-reset"></span>最初のコードに戻す</button>
+        <span class="stat-chip">クリア状況 <b id="progress-label">0 / 0</b></span>
+      </div>
+      <h3>実行結果</h3>
+      <div class="output-box" id="prob-output">（まだ実行していない）</div>
+      <div id="test-results"></div>
+      <div id="prob-solution"></div>
+    </section>
+  </section>
+
+  <!-- ===== プレイグラウンド ===== -->
+  <section id="playground-mode" style="display: none;">
+    <section class="panel">
+      <h2>プレイグラウンド</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem;">
+        好きな Python コードを実行できる。<code style="color: var(--accent);">print()</code> の出力と、最後の式の値が下に表示される。
+      </p>
+      <div class="editor-window">
+        <div class="editor-titlebar">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="editor-filename">playground.py</span>
+        </div>
+      <textarea class="editor" id="pg-editor" spellcheck="false" aria-label="プレイグラウンドのコードエディタ（Python）"># 例: ソートアルゴリズムの速度を比べてみる
+import random, time
+
+data = [random.randint(1, 1000) for _ in range(2000)]
+
+def bubble_sort(a):
+    a = a[:]
+    n = len(a)
+    for i in range(n - 1):
+        for j in range(n - 1 - i):
+            if a[j] > a[j + 1]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+    return a
+
+t0 = time.time()
+bubble_sort(data)
+t1 = time.time()
+sorted(data)
+t2 = time.time()
+
+print(f"バブルソート: {t1 - t0:.3f} 秒")
+print(f"Python 組み込み sorted (Timsort): {t2 - t1:.5f} 秒")
+</textarea>
+      </div>
+      <div class="controls" style="margin-top: 10px;">
+        <button class="btn success" id="pg-run-btn" disabled><span class="ico ico-play"></span>実行</button>
+      </div>
+      <h3>出力</h3>
+      <div class="output-box" id="pg-output">（まだ実行していない）</div>
+    </section>
+  </section>
+
+</main>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="js/common.js"></script>
+<script src="js/python.js"></script>
+</body>
+</html>

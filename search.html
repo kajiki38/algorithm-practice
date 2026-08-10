@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("dojo-theme")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235b9cf6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%226%22 cy=%226%22 r=%222.4%22/><circle cx=%226%22 cy=%2218%22 r=%222.4%22/><circle cx=%2218%22 cy=%2212%22 r=%222.4%22/><path d=%22M8.1 7.1 15.7 11M8.1 16.9 15.7 13%22/></svg>">
+<title>二分探索 — アルゴリズム道場</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+  <h1 class="page-title"><span class="ico ico-target"></span>二分探索（バイナリサーチ）</h1>
+  <p class="page-lead">
+    「半分に絞る」を繰り返すだけで、100 万件からでも高々 20 回で目的の値にたどり着ける ——
+    それが二分探索。アルゴリズムの世界でいちばん「賢さが伝わりやすい」やつだ。
+  </p>
+
+  <section class="panel">
+    <h2>このページで学ぶこと</h2>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      ようこそ、最初のステップへ。ここでやることは<b style="color: var(--text);">数当てゲームで遊ぶこと</b> —— それだけで、アルゴリズムの面白さの核心に触れられる。
+      分厚い辞書で「ねこ」を引くとき、1 ページ目からめくる人はいない。
+      <b style="color: var(--text);">適当に真ん中を開いて「た行か。ねこはもっと後ろだ」と半分を捨てる</b>はず。
+      この「半分に絞る」を作戦として意識的に使うのが<b style="color: var(--text);">二分探索</b>。
+      1 回比べるたびに候補が半分になるから、1000 件なら 10 回、100 万件でも 20 回で決着してしまう。
+    </p>
+    <p style="color: var(--text-dim); font-size: 0.95rem;">
+      ただしひとつだけ条件がある。<b style="color: var(--text);">データがあらかじめ順番に並んでいること</b>。
+      辞書が五十音順だから真ん中で捨てられるのであって、バラバラの紙の山では使えない。
+      では、バラバラのデータを並べ替えるには？ —— それが次のステップ「ソート」。
+      そして「なぜたった 20 回で済むのか」に名前をつけるのが STEP 3「計算量」。難しい話はそこまでお預けにして、まずは遊ぼう。
+    </p>
+    <h3>このページの使い方</h3>
+    <ol class="path-steps">
+      <li><span class="step-no">1</span><div class="step-body"><b>STEP 1 の数当てゲーム</b>で遊ぶ。まずは何も考えず好きに推測してよい。何回かかった？</div></li>
+      <li><span class="step-no">2</span><div class="step-body">次は毎回<b>「残り候補のちょうど真ん中」</b>を言う作戦で。7 回以内で必ず当たるはず。これが二分探索の心。</div></li>
+      <li><span class="step-no">3</span><div class="step-body"><b>STEP 2</b> で、今度は配列を相手に自分の手で二分探索を実行。手順どおりでないと進めない仕掛けなので、体で覚えられる。</div></li>
+      <li><span class="step-no">4</span><div class="step-body"><b>STEP 3</b> のスライダーで件数を増やし、線形探索との差が開いていく様子を見る。</div></li>
+    </ol>
+    <details class="hint-box">
+      <summary><span class="ico ico-book"></span> つまずいたら: 用語ミニ辞典</summary>
+      <dl class="glossary">
+        <dt>インデックス（添字）</dt>
+        <dd>配列の中での「何番目か」を表す番号。<b>0 から数える</b>のがプログラミングの流儀（先頭が 0 番、2 つ目が 1 番…）。セルの左上に小さく書いてある数字がこれ。</dd>
+        <dt><code>lo / hi / mid</code></dt>
+        <dd>「いま探している範囲」の下端(low)・上端(high)・中央(middle)のインデックス。二分探索は lo と hi を狭めていくゲーム。</dd>
+        <dt>(lo + hi) ÷ 2 の切り捨て</dt>
+        <dd>中央の位置の計算方法。たとえば lo=0, hi=5 なら 2.5 → 切り捨てて 2。小数のインデックスは存在しないので切り捨てる。</dd>
+        <dt>線形探索（せんけいたんさく）</dt>
+        <dd>先頭から順に 1 つずつ見ていく、いちばん素朴な探し方。並んでいないデータにはこれしかない。データが 1000 個なら最悪 1000 回見ることになる。</dd>
+      </dl>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>STEP 1: 数当てゲーム</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      コンピュータが <b>1〜127</b> の数をひとつ隠した。「もっと大きい／小さい」のヒントを頼りに当てよう。
+      理論上は <b>7 回以内</b> で必ず当てられる。どういう戦略なら 7 回で済むか、考えながら遊んでみて。
+    </p>
+    <div class="range-bar" id="guess-range-bar">
+      <div class="fill" id="guess-range-fill"></div>
+      <div class="label" id="guess-range-label">1 〜 127</div>
+    </div>
+    <div class="controls">
+      <input type="number" id="guess-input" min="1" max="127" placeholder="1〜127" aria-label="推測する数（1〜127）" style="width: 110px;">
+      <button class="btn primary" id="guess-btn">推測する</button>
+      <button class="btn" id="guess-new-btn"><span class="ico ico-replay"></span>新しいゲーム</button>
+      <button class="btn" id="guess-auto-btn"><span class="ico ico-bot"></span>お手本を見る（二分探索）</button>
+      <span class="stat-chip">推測回数 <b id="guess-count">0</b> / 目標 7</span>
+    </div>
+    <div id="guess-log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>STEP 2: 自分の手で二分探索を実行する</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      ソート済み配列から <b id="manual-target" style="color: var(--warn); font-size: 1.1rem;">?</b> を探す。
+      二分探索の手順どおりに操作しないと進めない。<b>① 現在の範囲の中央（mid = (lo + hi) ÷ 2 の切り捨て）をクリック → ② 比較結果から次の行動を選ぶ</b>、の繰り返し。
+    </p>
+    <div class="controls">
+      <button class="btn primary" id="manual-new-btn"><span class="ico ico-dice"></span>新しい問題</button>
+      <span class="stat-chip">手数 <b id="manual-moves">0</b></span>
+      <span class="stat-chip">ミス <b id="manual-mistakes">0</b></span>
+    </div>
+    <div class="array-cells" id="manual-cells"></div>
+    <div id="manual-status" class="msg info">「新しい問題」を押してスタート。</div>
+    <div class="controls" id="manual-actions" style="display: none;">
+      <button class="btn" id="act-left"><span class="ico ico-arrow-left"></span>目的の値は小さい → 左半分へ</button>
+      <button class="btn" id="act-found"><span class="ico ico-target"></span>一致した → 発見</button>
+      <button class="btn" id="act-right">目的の値は大きい → 右半分へ<span class="ico ico-arrow-right"></span></button>
+      <button class="btn" id="act-absent"><span class="ico ico-cross"></span>範囲が空 → 「存在しない」と結論</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>STEP 3: 線形探索との比較</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      データ件数を動かして、最悪ケースで必要な比較回数を見比べてみよう。
+      件数を 2 倍にしても、二分探索は <b>たった 1 回</b> 増えるだけ。これが O(log n) の正体。
+    </p>
+    <div class="controls">
+      <label>データ件数
+        <input type="range" id="race-n" min="1" max="9" value="3" step="0.05" style="width: 260px;">
+        <b id="race-n-label" style="font-family: var(--font-mono);">1,000</b>
+      </label>
+    </div>
+    <div class="stats">
+      <span class="stat-chip">線形探索（前から順に見る） <b id="race-linear" style="min-width: 16ch;">1,000 回</b></span>
+      <span class="stat-chip">二分探索 <b id="race-binary" style="min-width: 5ch;">10 回</b></span>
+    </div>
+    <div id="race-bars" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 70px; font-size: 0.8rem; color: var(--text-dim);">線形</span>
+        <div style="flex: 1; background: var(--bg-soft); border-radius: 6px; overflow: hidden;">
+          <div id="race-bar-linear" style="height: 20px; background: var(--danger); width: 100%;"></div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 70px; font-size: 0.8rem; color: var(--text-dim);">二分</span>
+        <div style="flex: 1; background: var(--bg-soft); border-radius: 6px; overflow: hidden;">
+          <div id="race-bar-binary" style="height: 20px; background: var(--accent-2); width: 1%;"></div>
+        </div>
+      </div>
+    </div>
+    <p style="color: var(--text-dim); font-size: 0.85rem;">
+      ※ バーの長さは比較回数の比率（線形探索を 100% とした場合）。
+      ただし二分探索には「事前にソートされていること」という前提が必要なことも忘れずに。
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>理解度チェック</h2>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">
+      このページの内容が身についたか、4 問で確認しよう。全問正解できたら次のステップへ。
+    </p>
+    <div class="controls">
+      <button class="btn primary" id="bs-quiz-start"><span class="ico ico-quiz"></span>クイズを始める</button>
+      <span class="stat-chip">スコア <b id="bs-quiz-score">- / -</b></span>
+    </div>
+    <div id="bs-quiz-area" class="quiz-zone"></div>
+  </section>
+</main>
+<script src="js/common.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/search.js"></script>
+</body>
+</html>
